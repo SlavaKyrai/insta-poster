@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./compose/local/dj_imposter/Dockerfile
+    image: imposter_web
+    # '/start' is the shell script used to run the service
+    command: /start
+    # this volume is used to map the files and folders on the host to the container
+    # so if we change code on the host, code in the docker container will also be changed
+    volumes:
+      - .:/app
+    ports:
+      - 8010:8000
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - 5432:5432
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      - default
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./compose/local/dj_imposter/Dockerfile
+    image: imposter_celery_worker
+    command: /start-celeryworker
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: ./compose/local/dj_imposter/Dockerfile
+    image: imposter_celery_beat
+    command: /start-celerybeat
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+
+  flower:
+    build:
+      context: .
+      dockerfile: ./compose/local/dj_imposter/Dockerfile
+    image: imposter_celery_flower
+    command: /start-flower
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - 5557:5555
+    depends_on:
+      - db
+      - rabbitmq
+
+volumes:
+  postgres_data:
