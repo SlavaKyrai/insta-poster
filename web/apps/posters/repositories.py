@@ -1,5 +1,5 @@
-from web.apps.crawlers.models import Post
-from web.apps.posters.models import TelegramChannel
+from apps.crawlers.models import Post
+from apps.posters.models import TelegramChannel
 
 
 class TelegramPosterService:
