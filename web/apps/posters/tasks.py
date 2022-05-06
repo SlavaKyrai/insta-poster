@@ -3,7 +3,7 @@ from dj_imposter.celery import app
 from django.conf import settings
 from telegram.ext import Updater
 
-from repositories import TelegramPosterService
+from apps.posters.repositories import TelegramPosterService
 
 
 @app.task
