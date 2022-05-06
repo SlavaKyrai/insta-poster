@@ -9,6 +9,7 @@ from apps.posters.repositories import TelegramPosterService
 @app.task
 def post_to_telegram_chats():
     for channel in TelegramChannel.objects.filter(is_active=True):
+        print('channel')
         post = TelegramPosterService.get_post_for_telegram_upload(channel)
         if post:
             try:
