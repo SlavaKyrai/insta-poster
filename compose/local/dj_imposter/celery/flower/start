@@ -1,0 +1,20 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+cd web
+
+worker_ready() {
+    celery -A dj_imposter inspect ping
+}
+
+until worker_ready; do
+  >&2 echo 'Celery workers not available'
+  sleep 1
+done
+>&2 echo 'Celery workers is available'
+
+celery flower \
+    --app=dj_imposter \
+    --broker="${CELERY_BROKER_URL}"
