@@ -39,12 +39,12 @@ def post_to_instagram_profile():
             try:
                 payload = {
                     'image_url': post.image_url,
-                    'caption': f'{post.title} + {profile.hashtags}',
+                    'caption': f'{post.title} {profile.hashtags}',
                     'access_token': profile.access_token
                 }
                 response = requests.post(post_media_url, data=payload)
                 print('-'*50)
-                print(response)
+                print(response.json())
                 print('-'*50)
                 result = response.json()
                 creation_id = result['id']
@@ -54,7 +54,7 @@ def post_to_instagram_profile():
                 }
                 requests.post(post_publish_url, data=second_payload)
                 print('-'*50)
-                print(response)
+                print(response.json())
                 print('-'*50)
             except Exception as e:
                 print(e)
