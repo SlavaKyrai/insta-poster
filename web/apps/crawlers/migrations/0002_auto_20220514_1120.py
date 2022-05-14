@@ -12,12 +12,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='post',
-            name='hashtags',
-            field=models.CharField(default=None, max_length=200),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='post',
             name='is_instagram_posted',
             field=models.BooleanField(default=False),
         ),
