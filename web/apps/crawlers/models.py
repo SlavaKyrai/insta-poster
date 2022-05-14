@@ -16,4 +16,7 @@ class Post(models.Model):
     title = models.TextField()
     image_url = models.URLField()
     score = models.BigIntegerField()
+    hashtags = models.CharField(max_length=200)
     is_telegram_posted = models.BooleanField(default=False)
+    is_instagram_posted = models.BooleanField(default=False)
+

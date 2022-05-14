@@ -11,3 +11,17 @@ class TelegramChannel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class InstagramProfile(models.Model):
+    name = models.CharField(max_length=50)
+    page_id = models.CharField(max_length=30)
+    access_token = models.CharField(max_length=250)
+    app_id = models.CharField(max_length=30)
+    app_secret = models.CharField(max_length=50)
+    is_active = models.BooleanField(default=True)
+    reddit_sources = models.ManyToManyField(RedditSource)
+    hashtags = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
