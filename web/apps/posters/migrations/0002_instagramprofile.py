@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('app_id', models.CharField(max_length=30)),
                 ('app_secret', models.CharField(max_length=50)),
                 ('is_active', models.BooleanField(default=True)),
-                ('hashtags', models.CharField(max_length=50)),
+                ('hashtags', models.CharField(max_length=50, null=True, blank=True)),
                 ('reddit_sources', models.ManyToManyField(to='crawlers.RedditSource')),
             ],
         ),
