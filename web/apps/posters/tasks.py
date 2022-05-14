@@ -43,6 +43,9 @@ def post_to_instagram_profile():
                     'access_token': profile.access_token
                 }
                 response = requests.post(post_media_url, data=payload)
+                print('-'*50)
+                print(response)
+                print('-'*50)
                 result = response.json()
                 creation_id = result['id']
                 second_payload = {
@@ -50,6 +53,9 @@ def post_to_instagram_profile():
                     'access_token': profile.access_token
                 }
                 requests.post(post_publish_url, data=second_payload)
+                print('-'*50)
+                print(response)
+                print('-'*50)
             except Exception as e:
                 print(e)
             finally:
