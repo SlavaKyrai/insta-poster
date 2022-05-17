@@ -34,7 +34,7 @@ def post_to_instagram_profile():
     for profile in InstagramProfile.objects.filter(is_active=True):
         post = PosterService.get_post_for_instagram_upload(profile)
         post_media_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media'
-        post_publish_url = 'https://graph.facebook.com/v13.0/{}/media_publish'.format("17841410755264157")
+        post_publish_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media_publish'
         if post:
             try:
                 payload = {
