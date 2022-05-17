@@ -21,7 +21,7 @@ class InstagramProfile(models.Model):
     app_secret = models.CharField(max_length=50)
     is_active = models.BooleanField(default=True)
     reddit_sources = models.ManyToManyField(RedditSource)
-    hashtags = models.CharField(max_length=50)
+    hashtags = models.TextField()
 
     def __str__(self):
         return self.name
