@@ -36,16 +36,13 @@ def post_to_instagram_profile():
         post_media_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media'
         post_publish_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media_publish'
         if post:
+            payload = {
+                'image_url': post.image_url,
+                'caption': f'{post.title} {profile.hashtags}',
+                'access_token': profile.access_token
+            }
             try:
-                payload = {
-                    'image_url': post.image_url,
-                    'caption': f'{post.title} {profile.hashtags}',
-                    'access_token': profile.access_token
-                }
                 response = requests.post(post_media_url, data=payload)
-                print('-'*50)
-                print(response.json())
-                print('-'*50)
                 result = response.json()
                 creation_id = result['id']
                 second_payload = {
@@ -53,11 +50,10 @@ def post_to_instagram_profile():
                     'access_token': profile.access_token
                 }
                 requests.post(post_publish_url, data=second_payload)
-                print('-'*50)
-                print(response.json())
-                print('-'*50)
             except Exception as e:
-                print(e)
+                print('-'*50)
+                print(post.image_url)
+                print('-'*50)
             finally:
                 post.is_instagram_posted = True
                 post.save(update_fields={'is_instagram_posted'})
