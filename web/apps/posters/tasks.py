@@ -1,10 +1,17 @@
-import requests
-from django.conf import settings
-from telegram.ext import Updater
+import random
+import time
 
+import requests
+from apps.posters.models import InstagrapiConfig
 from apps.posters.models import TelegramChannel, InstagramProfile
 from apps.posters.repositories import PosterService
+from apps.posters.utils import is_valid_account_to_follow
 from dj_imposter.celery import app
+from django.conf import settings
+from instagrapi import Client
+from telegram.ext import Updater
+
+insta_clients = {}
 
 
 @app.task
@@ -51,9 +58,55 @@ def post_to_instagram_profile():
                 }
                 requests.post(post_publish_url, data=second_payload)
             except Exception as e:
-                print('-'*50)
+                print('-' * 50)
                 print(post.image_url)
-                print('-'*50)
+                print('-' * 50)
             finally:
                 post.is_instagram_posted = True
                 post.save(update_fields={'is_instagram_posted'})
+
+
+@app.task
+def init_clients():
+    for config in InstagrapiConfig.objects.all():
+        cl = Client()
+        cl.set_settings(config.login_settings)
+        cl.login(config.login, config.password)
+        insta_clients[config.name] = cl
+
+
+@app.task
+def promote_insta_with_like_and_comment():
+    for client_name, client in insta_clients.items():
+        config = InstagrapiConfig.objects.get(name=client_name)
+        medias = client.hashtag_medias_recent(config.main_hashtag, amount=30)
+        for media in medias:
+            try:
+                if media.like_count > 700:
+                    client.media_comment(random.choice(config.comment_phrases), media.id)
+                else:
+                    client.media_like(media.id)
+            except Exception as e:
+                print(e)
+            else:
+                time.sleep(random.randint(2, 7))
+
+
+@app.task
+def promote_insta_with_subscribe_like_and_comment():
+    for client_name, client in insta_clients.items():
+        config = InstagrapiConfig.objects.get(name=client_name)
+        medias = client.hashtag_medias_recent(config.main_hashtag, amount=30)
+        for media in medias:
+            try:
+                if media.like_count > 700:
+                    client.media_comment(random.choice(config.comment_phrases), media.id)
+                else:
+                    client.media_like(media.id)
+                    user_info = client.user_info(media.user.pk)
+                    if is_valid_account_to_follow(user_info):
+                        client.user_follow(user_info.pk)
+            except Exception as e:
+                print(e)
+            else:
+                time.sleep(random.randint(2, 10))

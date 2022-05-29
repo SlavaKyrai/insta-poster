@@ -17,3 +17,6 @@ celery==5.2.6
 django-celery-beat==2.2.1
 flower==1.0.0
 python-telegram-bot==13.11
+django-solo==2.0.0
+instagrapi==1.16.17
+Pillow==9.1.1

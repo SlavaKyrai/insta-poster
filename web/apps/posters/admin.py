@@ -1,6 +1,5 @@
+from apps.posters.models import TelegramChannel, InstagramProfile, InstagrapiConfig
 from django.contrib import admin
-
-from apps.posters.models import TelegramChannel, InstagramProfile
 
 
 @admin.register(TelegramChannel)
@@ -10,4 +9,9 @@ class TelegramChanelAdmin(admin.ModelAdmin):
 
 @admin.register(InstagramProfile)
 class InstragramProfileAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(InstagrapiConfig)
+class InstagrapiConfigAdmin(admin.ModelAdmin):
     pass
