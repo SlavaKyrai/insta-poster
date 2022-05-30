@@ -1,7 +1,7 @@
 from instagrapi import Client
 from instagrapi.types import User
 
-from web.apps.posters.models import InstagrapiConfig
+from apps.posters.models import InstagrapiConfig
 
 
 def is_valid_account_to_follow(user_info: User):
