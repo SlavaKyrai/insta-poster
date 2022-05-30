@@ -1,4 +1,7 @@
+from instagrapi import Client
 from instagrapi.types import User
+
+from web.apps.posters.models import InstagrapiConfig
 
 
 def is_valid_account_to_follow(user_info: User):
@@ -16,3 +19,10 @@ def is_valid_account_to_follow(user_info: User):
     if following_rate > 10:
         return False
     return True
+
+
+def init_client(config: InstagrapiConfig) -> Client:
+    client = Client()
+    client.set_settings(config.login_settings)
+    client.login(config.login, config.password)
+    return client
