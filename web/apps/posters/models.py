@@ -1,6 +1,7 @@
-from apps.crawlers.models import RedditSource
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+
+from apps.crawlers.models import RedditSource
 
 
 class TelegramChannel(models.Model):
@@ -36,8 +37,11 @@ class InstagrapiConfig(models.Model):
     password = models.CharField(max_length=100)
     login_settings = models.JSONField()
     main_hashtag = models.CharField(max_length=50)
+    posting_hashtags = models.TextField(null=True, blank=True)
     like_posts = models.BooleanField(default=True)
     follow_users = models.BooleanField(default=True)
+    reddit_sources = models.ManyToManyField(RedditSource, blank=True)
+    last_post_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.name

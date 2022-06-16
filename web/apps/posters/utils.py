@@ -1,3 +1,7 @@
+import tempfile
+from contextlib import contextmanager
+
+import requests
 from instagrapi import Client
 from instagrapi.types import User
 
@@ -24,5 +28,15 @@ def is_valid_account_to_follow(user_info: User):
 def init_client(config: InstagrapiConfig) -> Client:
     client = Client()
     client.set_settings(config.login_settings)
-    client.login(config.login, config.password)
+    is_logged = client.login(config.login, config.password)
+    if not is_logged:
+        client.relogin()
     return client
+
+
+@contextmanager
+def temp_file_from_url(url):
+    with tempfile.NamedTemporaryFile() as tfile:
+        tfile.write(requests.get(url).content)
+        tfile.flush()
+        yield tfile.name

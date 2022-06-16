@@ -1,18 +1,21 @@
+import logging
 import random
 import time
+from pathlib import Path
 
 import requests
 from django.conf import settings
+from django.utils import timezone
 from telegram.ext import Updater
 
 from apps.posters.models import InstagrapiConfig
 from apps.posters.models import TelegramChannel, InstagramProfile
 from apps.posters.repositories import PosterService
-from apps.posters.utils import init_client
+from apps.posters.utils import init_client, temp_file_from_url
 from apps.posters.utils import is_valid_account_to_follow
 from dj_imposter.celery import app
 
-insta_clients = {}
+logger = logging.getLogger('celery')
 
 
 @app.task
@@ -31,7 +34,7 @@ def post_to_telegram_chats():
                     caption=post.title
                 )
             except Exception as e:
-                print(e)
+                logger.error(f'Failed to post to telegram {channel.name} details: {e}')
             finally:
                 post.is_telegram_posted = True
                 post.save(update_fields={'is_telegram_posted'})
@@ -59,9 +62,9 @@ def post_to_instagram_profile():
                 }
                 requests.post(post_publish_url, data=second_payload)
             except Exception as e:
-                print('-' * 50)
-                print(post.image_url)
-                print('-' * 50)
+                logger.error(
+                    f'Failed to post to telegram {profile.name} url {post.image_url} details: {e}'
+                )
             finally:
                 post.is_instagram_posted = True
                 post.save(update_fields={'is_instagram_posted'})
@@ -79,7 +82,9 @@ def promote_insta_with_like_and_comment():
                 else:
                     client.media_like(media.id)
             except Exception as e:
-                print(e)
+                logger.error(
+                    f'Failed to promote insta {client_config.name} details: {e}'
+                )
             else:
                 time.sleep(random.randint(3, 10))
 
@@ -99,6 +104,30 @@ def promote_insta_with_subscribe_like_and_comment():
                     if is_valid_account_to_follow(user_info):
                         client.user_follow(user_info.pk)
             except Exception as e:
-                print(e)
+                logger.error(
+                    f'Failed to promote insta {client_config.name} details: {e}'
+                )
             else:
                 time.sleep(random.randint(2, 15))
+
+
+@app.task
+def post_photo_to_instagram():
+    for client_config in InstagrapiConfig.objects.all():
+        try:
+            client = init_client(client_config)
+            post = PosterService.get_post_for_instagrapi_upload(client_config)
+            with temp_file_from_url(post.image_url) as file_name:
+                client.photo_upload(
+                    Path(file_name),
+                    f'{post.title} {client_config.posting_hashtags}'
+                )
+        except Exception as e:
+            logger.error(
+                f'Failed to post to insta {client_config.name} details: {e}'
+            )
+        else:
+            post.is_instagram_posted = True
+            post.save(update_fields={'is_instagram_posted'})
+            client_config.last_post_date = timezone.now()
+            client_config.save(update_fields={'last_post_date'})
