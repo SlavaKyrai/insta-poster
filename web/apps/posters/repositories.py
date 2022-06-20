@@ -2,7 +2,7 @@ from apps.crawlers.models import Post
 from apps.posters.models import TelegramChannel, InstagramProfile, InstagrapiConfig
 
 
-class PosterService:
+class PostRepository:
 
     @staticmethod
     def get_post_for_telegram_upload(channel: TelegramChannel):

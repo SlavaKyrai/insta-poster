@@ -18,4 +18,6 @@ class Post(models.Model):
     score = models.BigIntegerField()
     is_telegram_posted = models.BooleanField(default=False)
     is_instagram_posted = models.BooleanField(default=False)
+    author = models.CharField(max_length=50, null=True, blank=True)
+    crawled_at = models.DateTimeField(auto_now=True)
 

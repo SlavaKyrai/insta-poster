@@ -14,4 +14,4 @@ class InstragramProfileAdmin(admin.ModelAdmin):
 
 @admin.register(InstagrapiConfig)
 class InstagrapiConfigAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'last_post_date',)

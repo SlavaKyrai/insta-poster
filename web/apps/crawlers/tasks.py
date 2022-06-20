@@ -6,7 +6,7 @@ from dj_imposter.celery import app
 @app.task
 def crawl_reddit_post():
     for source in RedditSource.objects.filter(is_active=True):
-        posts = reddit_client.subreddit(source.subreddit_name).top('day', limit=source.post_limit)
+        posts = reddit_client.subreddit(source.subreddit_name).top('week', limit=source.post_limit)
         for post in posts:
             Post.objects.update_or_create(
                 id=post.id,
@@ -14,6 +14,7 @@ def crawl_reddit_post():
                     'title': post.title,
                     'image_url': post.url,
                     'score': post.score,
-                    'subreddit': source
+                    'subreddit': source,
+                    'author': post.author
                 }
             )

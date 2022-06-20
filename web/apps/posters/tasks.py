@@ -1,17 +1,16 @@
 import logging
 import random
 import time
-from pathlib import Path
 
 import requests
 from django.conf import settings
-from django.utils import timezone
 from telegram.ext import Updater
 
 from apps.posters.models import InstagrapiConfig
 from apps.posters.models import TelegramChannel, InstagramProfile
-from apps.posters.repositories import PosterService
-from apps.posters.utils import init_client, temp_file_from_url
+from apps.posters.repositories import PostRepository
+from apps.posters.services import InstagramService
+from apps.posters.utils import init_client
 from apps.posters.utils import is_valid_account_to_follow
 from dj_imposter.celery import app
 
@@ -21,7 +20,7 @@ logger = logging.getLogger('celery')
 @app.task
 def post_to_telegram_chats():
     for channel in TelegramChannel.objects.filter(is_active=True):
-        post = PosterService.get_post_for_telegram_upload(channel)
+        post = PostRepository.get_post_for_telegram_upload(channel)
         if post:
             try:
                 updater = Updater(
@@ -43,7 +42,7 @@ def post_to_telegram_chats():
 @app.task
 def post_to_instagram_profile():
     for profile in InstagramProfile.objects.filter(is_active=True):
-        post = PosterService.get_post_for_instagram_upload(profile)
+        post = PostRepository.get_post_for_instagram_upload(profile)
         post_media_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media'
         post_publish_url = f'https://graph.facebook.com/v13.0/{profile.page_id}/media_publish'
         if post:
@@ -114,20 +113,5 @@ def promote_insta_with_subscribe_like_and_comment():
 @app.task
 def post_photo_to_instagram():
     for client_config in InstagrapiConfig.objects.all():
-        try:
-            client = init_client(client_config)
-            post = PosterService.get_post_for_instagrapi_upload(client_config)
-            with temp_file_from_url(post.image_url) as file_name:
-                client.photo_upload(
-                    Path(file_name),
-                    f'{post.title} {client_config.posting_hashtags}'
-                )
-        except Exception as e:
-            logger.error(
-                f'Failed to post to insta {client_config.name} details: {e}'
-            )
-        else:
-            post.is_instagram_posted = True
-            post.save(update_fields={'is_instagram_posted'})
-            client_config.last_post_date = timezone.now()
-            client_config.save(update_fields={'last_post_date'})
+        post = PostRepository.get_post_for_instagrapi_upload(client_config)
+        is_posted = InstagramService(client_config).post_photo(post)
