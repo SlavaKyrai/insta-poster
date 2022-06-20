@@ -100,7 +100,7 @@ def get_geolocation_from_text(text):
 
 
 def get_location_name_from_text(text):
-    nlp = spacy.load('en_core_web_md')
+    nlp = spacy.load('en_core_web_sm')
     doc = nlp(text)
     for entity in doc.ents:
         if entity.label_ == 'GPE':

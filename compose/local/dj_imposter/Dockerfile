@@ -18,7 +18,7 @@ RUN apt-get update \
 COPY ./requirements.txt /requirements.txt
 RUN pip install -r /requirements.txt
 
-RUN python3 -m spacy download en_core_web_md
+RUN python3 -m spacy download en_core_web_sm
 
 COPY ./compose/local/dj_imposter/entrypoint /entrypoint
 RUN sed -i 's/\r$//g' /entrypoint
