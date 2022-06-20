@@ -14,7 +14,6 @@ from apps.crawlers.models import Post
 from apps.posters.dto import InstagramPostData
 from apps.posters.models import InstagrapiConfig
 
-nlp = spacy.load('en_core_web_md')
 # [OC] (OC) 1920x1800 variations
 reddit_re = re.compile(
     r'(\[OC])|(\(OC\))|(\(\d+x\d+\))|(\[\d+x\d+\])|(\d+x\d+)',
@@ -101,6 +100,7 @@ def get_geolocation_from_text(text):
 
 
 def get_location_name_from_text(text):
+    nlp = spacy.load('en_core_web_md')
     doc = nlp(text)
     for entity in doc.ents:
         if entity.label_ == 'GPE':
