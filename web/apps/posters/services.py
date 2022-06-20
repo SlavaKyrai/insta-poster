@@ -37,6 +37,7 @@ class InstagramService:
         else:
             self.config.last_post_date = timezone.now()
             self.config.save(update_fields={'last_post_date'})
+            return True
+        finally:
             post.is_instagram_posted = True
             post.save(update_fields={'is_instagram_posted'})
-            return True
