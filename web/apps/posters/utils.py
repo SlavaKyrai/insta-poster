@@ -81,13 +81,16 @@ def get_instagram_post_data(file_name: str, post: Post, config: InstagrapiConfig
 
 
 def get_location_for_instagram(client: Client, text) -> Optional[Location]:
-    text_location = get_location_name_from_text(text)
-    if text_location:
-        geolocation = get_geolocation_from_text(text)
-        insta_locations = client.location_search(geolocation.latitude, geolocation.longitude)
-        for location in insta_locations:
-            if get_location_name_from_text(location.name):
-                return location
+    try:
+        text_location = get_location_name_from_text(text)
+        if text_location:
+            geolocation = get_geolocation_from_text(text)
+            insta_locations = client.location_search(geolocation.latitude, geolocation.longitude)
+            for location in insta_locations:
+                if get_location_name_from_text(location.name):
+                    return location
+    except Exception:
+        return None
     return None
 
 
