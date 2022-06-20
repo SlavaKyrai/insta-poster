@@ -41,9 +41,10 @@ class InstagrapiConfig(models.Model):
     like_posts = models.BooleanField(default=True)
     follow_users = models.BooleanField(default=True)
     reddit_sources = models.ManyToManyField(RedditSource, blank=True)
+    post_photo = models.BooleanField(default=True)
     last_post_date = models.DateTimeField(null=True, blank=True)
     use_location_in_post = models.BooleanField(default=True)
-    mention_author = models.BooleanField(default=False)
+    mention_author = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name

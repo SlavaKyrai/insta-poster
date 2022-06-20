@@ -84,7 +84,7 @@ def get_location_for_instagram(client: Client, text) -> Optional[Location]:
     try:
         text_location = get_location_name_from_text(text)
         if text_location:
-            geolocation = get_geolocation_from_text(text)
+            geolocation = get_geolocation_from_text(text_location)
             insta_locations = client.location_search(geolocation.latitude, geolocation.longitude)
             for location in insta_locations:
                 if get_location_name_from_text(location.name):
