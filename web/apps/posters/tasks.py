@@ -112,6 +112,6 @@ def promote_insta_with_subscribe_like_and_comment():
 
 @app.task
 def post_photo_to_instagram():
-    for client_config in InstagrapiConfig.objects.all():
+    for client_config in InstagrapiConfig.objects.filter(post_photo=True):
         post = PostRepository.get_post_for_instagrapi_upload(client_config)
-        is_posted = InstagramService(client_config).post_photo(post)
+        InstagramService(client_config).post_photo(post)
