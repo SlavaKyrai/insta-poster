@@ -70,16 +70,13 @@ def post_to_instagram_profile():
 
 
 @app.task
-def promote_insta_with_like_and_comment():
-    for client_config in InstagrapiConfig.objects.all():
+def promote_insta_by_like():
+    for client_config in InstagrapiConfig.objects.filter(like_posts=True):
         client = init_client(client_config)
         medias = client.hashtag_medias_recent(client_config.main_hashtag, amount=30)
         for media in medias:
             try:
-                if media.like_count > 700:
-                    client.media_comment(random.choice(client_config.comment_phrases), media.id)
-                else:
-                    client.media_like(media.id)
+                client.media_like(media.id)
             except Exception as e:
                 logger.error(
                     f'Failed to promote insta {client_config.name} details: {e}'
@@ -89,19 +86,16 @@ def promote_insta_with_like_and_comment():
 
 
 @app.task
-def promote_insta_with_subscribe_like_and_comment():
-    for client_config in InstagrapiConfig.objects.all():
+def promote_insta_by_subscribe():
+    for client_config in InstagrapiConfig.objects.filter(follow_users=True):
         client = init_client(client_config)
         medias = client.hashtag_medias_recent(client_config.main_hashtag, amount=30)
         for media in medias:
             try:
-                if media.like_count > 700:
-                    client.media_comment(random.choice(client_config.comment_phrases), media.id)
-                else:
-                    client.media_like(media.id)
-                    user_info = client.user_info(media.user.pk)
-                    if is_valid_account_to_follow(user_info):
-                        client.user_follow(user_info.pk)
+                client.media_like(media.id)
+                user_info = client.user_info(media.user.pk)
+                if is_valid_account_to_follow(user_info):
+                    client.user_follow(user_info.pk)
             except Exception as e:
                 logger.error(
                     f'Failed to promote insta {client_config.name} details: {e}'
