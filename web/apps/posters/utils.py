@@ -1,6 +1,7 @@
 import re
 import tempfile
 from contextlib import contextmanager
+from math import cos, asin, sqrt
 from pathlib import Path
 from typing import Optional
 
@@ -85,6 +86,11 @@ def get_location_for_instagram(client: Client, text) -> Optional[Location]:
         if text_location:
             geolocation = get_geolocation_from_text(text_location)
             insta_locations = client.location_search(geolocation.latitude, geolocation.longitude)
+            insta_locations.sort(
+                key=lambda insta_loc: distance(
+                    geolocation.latitude, geolocation.longitude, insta_loc.lat, insta_loc.lng
+                )
+            )
             for location in insta_locations:
                 if get_location_name_from_text(location.name):
                     return location
@@ -103,6 +109,12 @@ def get_location_name_from_text(text):
     nlp = spacy.load('en_core_web_sm')
     doc = nlp(text)
     for entity in doc.ents:
-        if entity.label_ == 'GPE':
+        if entity.label_ in ('GPE', 'LOC'):
             return str(entity)
     return None
+
+
+def distance(lat1, lon1, lat2, lon2):
+    p = 0.017453292519943295
+    hav = 0.5 - cos((lat2 - lat1) * p) / 2 + cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2
+    return 12742 * asin(sqrt(hav))
