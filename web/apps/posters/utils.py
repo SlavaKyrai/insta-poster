@@ -69,7 +69,7 @@ def get_instagram_post_data(file_name: str, post: Post, config: InstagrapiConfig
     location = None
     if config.mention_author:
         if post.author:
-            caption = f'{title}\n\nauthor:{post.author}\n.\n.\n.\n{config.posting_hashtags}'
+            caption = f'{title}\n\nauthor:{post.author}\n.\n.\n.\n{config.posting_hashtags} from reddit'
     if config.use_location_in_post:
         location = get_location_for_instagram(client, title)
     post_data = InstagramPostData(
