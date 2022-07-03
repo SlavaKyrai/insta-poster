@@ -108,4 +108,5 @@ def promote_insta_by_subscribe():
 def post_photo_to_instagram():
     for client_config in InstagrapiConfig.objects.filter(post_photo=True):
         post = PostRepository.get_post_for_instagrapi_upload(client_config)
-        InstagramService(client_config).post_photo(post)
+        if post:
+            InstagramService(client_config).post_photo(post)
