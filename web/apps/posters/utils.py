@@ -13,7 +13,7 @@ from instagrapi.types import User, Location
 
 from apps.crawlers.models import Post
 from apps.posters.dto import InstagramPostData
-from apps.posters.models import InstagrapiConfig
+from apps.posters.models import InstagrapiConfig, InstagramPostConfig
 
 # [OC] (OC) 1920x1800 variations
 reddit_re = re.compile(
@@ -42,7 +42,7 @@ def is_valid_account_to_follow(user_info: User):
 def init_client(config: InstagrapiConfig) -> Client:
     client = Client()
     client.set_settings(config.login_settings)
-    is_logged = client.login(config.login, config.password)
+    is_logged = client.login(config.login, config.password, relogin=True)
     if not is_logged:
         client.relogin()
     return client
@@ -62,14 +62,14 @@ def normalize_title(title: str):
     return title
 
 
-def get_instagram_post_data(file_name: str, post: Post, config: InstagrapiConfig, client: Client):
+def get_instagram_post_data(file_name: str, post: Post, config: InstagramPostConfig, client: Client):
     path = Path(file_name)
     title = normalize_title(post.title)
     caption = f'{title}\n.\n.\n.\n{config.posting_hashtags}'
     location = None
     if config.mention_author:
         if post.author:
-            caption = f'{title}\n\nauthor:{post.author}\n.\n.\n.\n{config.posting_hashtags} from reddit'
+            caption = f'{title}\n.\nauthor:{post.author} from reddit\n.\n.\n.\n{config.posting_hashtags}'
     if config.use_location_in_post:
         location = get_location_for_instagram(client, title)
     post_data = InstagramPostData(

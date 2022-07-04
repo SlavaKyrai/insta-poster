@@ -21,7 +21,7 @@ class InstagramService:
                 data = get_instagram_post_data(
                     file_name,
                     post,
-                    self.config,
+                    self.config.postconfig,
                     self.client
                 )
                 self.client.photo_upload(
