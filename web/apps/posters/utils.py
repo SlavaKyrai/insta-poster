@@ -42,7 +42,7 @@ def is_valid_account_to_follow(user_info: User):
 def init_client(config: InstagrapiConfig) -> Client:
     client = Client()
     client.set_settings(config.login_settings)
-    is_logged = client.login(config.login, config.password, relogin=True)
+    is_logged = client.login(config.login, config.password)
     if not is_logged:
         client.relogin()
     return client
